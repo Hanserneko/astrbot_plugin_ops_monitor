@@ -1,0 +1,10 @@
+name: astrbot_plugin_ops_monitor
+display_name: 运维监控
+desc: 支持 SSH 与 HTTP/HTTPS 探活、Linux 状态采集、群聊与私聊告警、自定义模板、次数防抖与临时屏蔽。
+version: 0.1.2
+author: hanser_no_neko
+astrbot_version: ">=4.10.4,<5"
+tags:
+  - 运维
+  - 监控
+  - 告警

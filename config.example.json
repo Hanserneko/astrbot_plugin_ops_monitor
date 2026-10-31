@@ -1,0 +1,48 @@
+{
+  "enabled": true,
+  "max_concurrency": 5,
+  "recipients": [],
+  "defaults": {
+    "trigger_times": 3,
+    "count_mode": "consecutive",
+    "window_size": 5,
+    "recovery_times": 2,
+    "repeat_interval": 1800,
+    "notify_recovery": true,
+    "alert_template": "🔴 运维告警｜{name}\n事件：{event}\n详情：{detail}\n触发：{count}/{trigger_times} 次\n时间：{time}",
+    "recovery_template": "🟢 运维恢复｜{name}\n事件：{event}\n详情：{detail}\n持续：{duration} 秒\n时间：{time}"
+  },
+  "monitors": [
+    {
+      "__template_key": "http",
+      "id": "website",
+      "name": "业务网站",
+      "url": "https://example.com/health",
+      "expected_status": "200,204",
+      "interval": 30,
+      "timeout": 10,
+      "trigger_times": 3,
+      "alert_template": "🔴 {name} 连续异常 {count} 次，请检查业务。\n{detail}\n{time}"
+    },
+    {
+      "__template_key": "ssh",
+      "id": "server01",
+      "name": "生产服务器",
+      "host": "192.0.2.10",
+      "port": 22,
+      "username": "monitor",
+      "key_path": "/app/data/keys/monitor_ed25519",
+      "known_hosts": "/app/data/keys/known_hosts",
+      "collect_metrics": true,
+      "disk_paths": [
+        "/",
+        "/var"
+      ],
+      "cpu_threshold": 85,
+      "memory_threshold": 90,
+      "disk_threshold": 90,
+      "interval": 60,
+      "trigger_times": 3
+    }
+  ]
+}

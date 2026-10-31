@@ -1,0 +1,392 @@
+{
+  "enabled": {
+    "description": "启用监控",
+    "type": "bool",
+    "default": true
+  },
+  "max_concurrency": {
+    "description": "最大并发探测数",
+    "type": "int",
+    "default": 5
+  },
+  "recipients": {
+    "description": "全局接收会话 UMO（群聊 / 私聊）",
+    "type": "list",
+    "default": [],
+    "hint": "由管理员在目标群聊或私聊执行 /ops bind 自动填写，可同时绑定多个群和个人"
+  },
+  "defaults": {
+    "description": "全局告警策略",
+    "type": "object",
+    "items": {
+      "trigger_times": {
+        "description": "触发次数",
+        "type": "int",
+        "default": 3
+      },
+      "count_mode": {
+        "description": "计数方式",
+        "type": "string",
+        "default": "consecutive",
+        "hint": "consecutive：连续异常；window：最近 N 次采样中异常 X 次",
+        "options": [
+          "consecutive",
+          "window"
+        ]
+      },
+      "window_size": {
+        "description": "窗口采样数",
+        "type": "int",
+        "default": 5
+      },
+      "recovery_times": {
+        "description": "连续正常次数后恢复",
+        "type": "int",
+        "default": 2
+      },
+      "repeat_interval": {
+        "description": "重复告警间隔秒（0 仅首次）",
+        "type": "int",
+        "default": 1800
+      },
+      "notify_recovery": {
+        "description": "恢复通知",
+        "type": "bool",
+        "default": true
+      },
+      "alert_template": {
+        "description": "告警消息模板",
+        "type": "text",
+        "default": "🔴 运维告警｜{name}\n事件：{event}\n详情：{detail}\n触发：{count}/{trigger_times} 次\n时间：{time}",
+        "hint": "支持 {name} {id} {event} {detail} {value} {threshold} {count} {trigger_times} {time} {duration} {status} {kind} {event_key}"
+      },
+      "recovery_template": {
+        "description": "恢复消息模板",
+        "type": "text",
+        "default": "🟢 运维恢复｜{name}\n事件：{event}\n详情：{detail}\n持续：{duration} 秒\n时间：{time}"
+      }
+    }
+  },
+  "monitors": {
+    "description": "监控项",
+    "type": "template_list",
+    "default": [],
+    "templates": {
+      "ssh": {
+        "name": "SSH 探活 / Linux 状态",
+        "display_item": "name",
+        "items": {
+          "id": {
+            "description": "唯一 ID",
+            "type": "string",
+            "default": "",
+            "hint": "字母、数字、下划线、短横线；修改 ID 会重新计数"
+          },
+          "name": {
+            "description": "显示名称",
+            "type": "string",
+            "default": ""
+          },
+          "enabled": {
+            "description": "启用此监控",
+            "type": "bool",
+            "default": true
+          },
+          "interval": {
+            "description": "探测间隔（秒）",
+            "type": "int",
+            "default": 60
+          },
+          "timeout": {
+            "description": "超时（秒）",
+            "type": "int",
+            "default": 10,
+            "hint": "SSH 连接与状态采集各有独立超时"
+          },
+          "recipients": {
+            "description": "此项接收会话 UMO（群聊 / 私聊）",
+            "type": "list",
+            "default": [],
+            "hint": "空列表继承全局；在目标群聊或私聊 /ops umo 获取，或 /ops bind <id> 绑定"
+          },
+          "latency_threshold_ms": {
+            "description": "延迟告警阈值（毫秒，0 禁用）",
+            "type": "int",
+            "default": 0,
+            "hint": "包含登录与采集的完整耗时"
+          },
+          "host": {
+            "description": "SSH 主机",
+            "type": "string",
+            "default": ""
+          },
+          "port": {
+            "description": "SSH 端口",
+            "type": "int",
+            "default": 22
+          },
+          "username": {
+            "description": "SSH 用户",
+            "type": "string",
+            "default": ""
+          },
+          "password": {
+            "description": "SSH 密码",
+            "type": "string",
+            "default": "",
+            "hint": "与私钥二选一，私钥优先",
+            "secret": true
+          },
+          "key_path": {
+            "description": "私钥文件路径",
+            "type": "string",
+            "default": "",
+            "hint": "AstrBot 宿主机或容器内的路径"
+          },
+          "key_passphrase": {
+            "description": "私钥口令",
+            "type": "string",
+            "default": "",
+            "secret": true
+          },
+          "verify_host_key": {
+            "description": "校验 SSH 主机密钥",
+            "type": "bool",
+            "default": true
+          },
+          "known_hosts": {
+            "description": "known_hosts 文件路径",
+            "type": "string",
+            "default": "",
+            "hint": "留空使用 AstrBot 运行用户的 ~/.ssh/known_hosts"
+          },
+          "collect_metrics": {
+            "description": "采集 Linux 状态",
+            "type": "bool",
+            "default": true,
+            "hint": "远程需要 Linux 与 python3；关闭后仅验证 SSH 登录"
+          },
+          "disk_paths": {
+            "description": "采集磁盘路径",
+            "type": "list",
+            "default": [
+              "/"
+            ]
+          },
+          "cpu_threshold": {
+            "description": "CPU 使用率告警阈值（%，0 禁用）",
+            "type": "int",
+            "default": 85
+          },
+          "memory_threshold": {
+            "description": "内存使用率告警阈值（%，0 禁用）",
+            "type": "int",
+            "default": 90
+          },
+          "disk_threshold": {
+            "description": "磁盘使用率告警阈值（%，0 禁用）",
+            "type": "int",
+            "default": 90
+          },
+          "load_threshold": {
+            "description": "1 分钟负载阈值（绝对值，0 禁用）",
+            "type": "float",
+            "default": 0
+          },
+          "trigger_times": {
+            "description": "触发次数（0 继承全局）",
+            "type": "int",
+            "default": 0
+          },
+          "count_mode": {
+            "description": "计数方式",
+            "type": "string",
+            "default": "inherit",
+            "hint": "consecutive：连续异常；window：最近 N 次采样中异常 X 次",
+            "options": [
+              "inherit",
+              "consecutive",
+              "window"
+            ]
+          },
+          "window_size": {
+            "description": "窗口采样数（0 继承全局）",
+            "type": "int",
+            "default": 0
+          },
+          "recovery_times": {
+            "description": "连续正常次数后恢复（0 继承全局）",
+            "type": "int",
+            "default": 0
+          },
+          "repeat_interval": {
+            "description": "重复告警间隔秒（-1 继承；0 仅首次）",
+            "type": "int",
+            "default": -1
+          },
+          "notify_recovery": {
+            "description": "恢复通知",
+            "type": "string",
+            "default": "inherit",
+            "options": [
+              "inherit",
+              "on",
+              "off"
+            ]
+          },
+          "alert_template": {
+            "description": "告警消息模板（空白继承全局）",
+            "type": "text",
+            "default": "",
+            "hint": "支持 {name} {id} {event} {detail} {value} {threshold} {count} {trigger_times} {time} {duration} {status} {kind} {event_key}"
+          },
+          "recovery_template": {
+            "description": "恢复消息模板（空白继承全局）",
+            "type": "text",
+            "default": ""
+          }
+        }
+      },
+      "http": {
+        "name": "HTTP / HTTPS 探活",
+        "display_item": "name",
+        "items": {
+          "id": {
+            "description": "唯一 ID",
+            "type": "string",
+            "default": "",
+            "hint": "字母、数字、下划线、短横线；修改 ID 会重新计数"
+          },
+          "name": {
+            "description": "显示名称",
+            "type": "string",
+            "default": ""
+          },
+          "enabled": {
+            "description": "启用此监控",
+            "type": "bool",
+            "default": true
+          },
+          "interval": {
+            "description": "探测间隔（秒）",
+            "type": "int",
+            "default": 60
+          },
+          "timeout": {
+            "description": "超时（秒）",
+            "type": "int",
+            "default": 10,
+            "hint": "SSH 连接与状态采集各有独立超时"
+          },
+          "recipients": {
+            "description": "此项接收会话 UMO（群聊 / 私聊）",
+            "type": "list",
+            "default": [],
+            "hint": "空列表继承全局；在目标群聊或私聊 /ops umo 获取，或 /ops bind <id> 绑定"
+          },
+          "latency_threshold_ms": {
+            "description": "延迟告警阈值（毫秒，0 禁用）",
+            "type": "int",
+            "default": 0,
+            "hint": "包含登录与采集的完整耗时"
+          },
+          "url": {
+            "description": "HTTP/HTTPS URL",
+            "type": "string",
+            "default": ""
+          },
+          "method": {
+            "description": "请求方法",
+            "type": "string",
+            "default": "GET",
+            "options": [
+              "GET",
+              "HEAD"
+            ]
+          },
+          "expected_status": {
+            "description": "期望状态码",
+            "type": "string",
+            "default": "200",
+            "hint": "多个状态码用英文逗号分隔，如 200,204"
+          },
+          "headers_json": {
+            "description": "请求头 JSON",
+            "type": "string",
+            "default": "{}",
+            "hint": "例如 {\"Authorization\":\"Bearer ...\"}；不会把请求头或 URL 写入通知",
+            "secret": true
+          },
+          "body_contains": {
+            "description": "响应必须包含的文本",
+            "type": "string",
+            "default": "",
+            "hint": "空白不检查；仅检查响应前 64 KiB，需使用 GET"
+          },
+          "verify_tls": {
+            "description": "校验 HTTPS 证书",
+            "type": "bool",
+            "default": true
+          },
+          "follow_redirects": {
+            "description": "跟随重定向",
+            "type": "bool",
+            "default": true
+          },
+          "trigger_times": {
+            "description": "触发次数（0 继承全局）",
+            "type": "int",
+            "default": 0
+          },
+          "count_mode": {
+            "description": "计数方式",
+            "type": "string",
+            "default": "inherit",
+            "hint": "consecutive：连续异常；window：最近 N 次采样中异常 X 次",
+            "options": [
+              "inherit",
+              "consecutive",
+              "window"
+            ]
+          },
+          "window_size": {
+            "description": "窗口采样数（0 继承全局）",
+            "type": "int",
+            "default": 0
+          },
+          "recovery_times": {
+            "description": "连续正常次数后恢复（0 继承全局）",
+            "type": "int",
+            "default": 0
+          },
+          "repeat_interval": {
+            "description": "重复告警间隔秒（-1 继承；0 仅首次）",
+            "type": "int",
+            "default": -1
+          },
+          "notify_recovery": {
+            "description": "恢复通知",
+            "type": "string",
+            "default": "inherit",
+            "options": [
+              "inherit",
+              "on",
+              "off"
+            ]
+          },
+          "alert_template": {
+            "description": "告警消息模板（空白继承全局）",
+            "type": "text",
+            "default": "",
+            "hint": "支持 {name} {id} {event} {detail} {value} {threshold} {count} {trigger_times} {time} {duration} {status} {kind} {event_key}"
+          },
+          "recovery_template": {
+            "description": "恢复消息模板（空白继承全局）",
+            "type": "text",
+            "default": ""
+          }
+        }
+      }
+    }
+  }
+}

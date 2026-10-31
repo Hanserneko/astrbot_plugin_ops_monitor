@@ -1,0 +1,13 @@
+# GitHub 源码归档只保留插件运行与说明文件。
+/references export-ignore
+/tests export-ignore
+/tools export-ignore
+/.venv export-ignore
+/.ruff_cache export-ignore
+/dist export-ignore
+/pyproject.toml export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore
+**/__pycache__ export-ignore
+*.py[cod] export-ignore
+*.local.json export-ignore
